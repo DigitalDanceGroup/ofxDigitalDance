@@ -155,6 +155,7 @@ void ofxDigitalDanceBvh::childroopScaledOffset(const ofxBvhJoint* joint, string 
 void ofxDigitalDanceBvh::exportScaledOffset(string filename, float scale) {
 	string str = " ";
 	ofs.open(filename);
+
 	//HIERARCHY
 	ofs << "HIERARCHY" << endl;
 	// ROOTの情報を書く
@@ -187,28 +188,28 @@ void ofxDigitalDanceBvh::exportScaledOffset(string filename, float scale) {
 
 	ofs.close();
 }
-//
-//vector<vector<double>> ofxDigitalDanceBvh::exportAngular() {
-//	vector<vector<double>> ang(this->getNumFrames(), vector<double>(27));
-//	for (int i = 0; i<this->num_frames; i++)
-//	{
-//		int countend = 0;
-//		int numj = 0;
-//		for (int j = 0; j<this->getNumJoints(); j++) {
-//			string name = this->getJoint(j)->getName();
-//			if (name == "Hips" || name == "RightShoulder" || name == "RightElbow" || name == "LeftShoulder" || name == "LeftElbow" || name == "RightHip" || name == "RightKnee" || name == "LeftHip" || name == "LeftKnee") {
-//				ang[i][3 * numj] = frames.at(i).at(3 + (3 * j) - (3 * countend));
-//				ang[i][(3 * numj) + 1] = frames.at(i).at(4 + (3 * j) - (3 * countend));
-//				ang[i][(3 * numj) + 2] = frames.at(i).at(5 + (3 * j) - (3 * countend));
-//				numj++;
-//			}
-//			else if (name == "Site") {
-//				countend++;
-//			}
-//		}
-//	}
-//	return ang;
-//}
+
+vector<vector<double>> ofxDigitalDanceBvh::exportAngular() {
+	vector<vector<double>> ang(this->num_frames, vector<double>(27));
+	for (int i = 0; i<this->num_frames; i++)
+	{
+		int countend = 0;
+		int numj = 0;
+		for (int j = 0; j<this->getNumJoints(); j++) {
+			string name = this->getJoint(j)->getName();
+			if (name == "Hips" || name == "RightShoulder" || name == "RightElbow" || name == "LeftShoulder" || name == "LeftElbow" || name == "RightHip" || name == "RightKnee" || name == "LeftHip" || name == "LeftKnee") {
+				ang[i][3 * numj] = frames.at(i).at(3 + (3 * j) - (3 * countend));
+				ang[i][(3 * numj) + 1] = frames.at(i).at(4 + (3 * j) - (3 * countend));
+				ang[i][(3 * numj) + 2] = frames.at(i).at(5 + (3 * j) - (3 * countend));
+				numj++;
+			}
+			else if (name == "Site") {
+				countend++;
+			}
+		}
+	}
+	return ang;
+}
 
 void ofxDigitalDanceBvh::exportAngulartoCSV(string filename) {
 	ofs.open(filename);
@@ -1397,61 +1398,61 @@ void ofxDigitalDanceBvh::segmentationBVH_4C(string filename) {
 	}
 }
 
-//
-//int ofxDigitalDanceBvh::GreedySampling(float q, float weighteffort[], float max_WE, vector<vector<float>>& D, int Sn[], int n, float rho) {
-//	cout << D.size() << endl;
-//
-//	int bvh_path_num = 0; // 返り値の初期化
-//	float max_score = 0.0; // 最大化したいスコア
-//	
-//	for(int i=0; i<D.size(); i++){
-//		// すでにサンプルとして選ばれているデータ（Sn[]にあるデータ）は除く
-//		bool overlapped_data = false;
-//		for(int num_Sn = 0; num_Sn < n; num_Sn++){
-//			if(i == Sn[num_Sn]){
-//				overlapped_data = true;
-//			}
-//		}
-//		if(overlapped_data){
-//			continue;
-//		}
-//		
-//		// すでに選ばれていなければ返すパス番号の探索に移る
-//		if(max_score < (rho * rel_Music_WE(q, weighteffort[i], D.size()))+((1.0-rho) * phi_DistanceScore(i, D, Sn, n))){
-//			bvh_path_num = i;
-//			max_score = (rho * rel_Music_WE(q, weighteffort[i], D.size()))+((1.0-rho) * phi_DistanceScore(i, D, Sn, n));
-//		}
-//	}
-//
-//	return bvh_path_num;
-//}
-//
-//float ofxDigitalDanceBvh::rel_Music_WE(float q, float weighteffort, float max_WE){
-//	return 1.0 - ((q - weighteffort)/max_WE);
-//}
-//
-//float ofxDigitalDanceBvh::phi_DistanceScore(int bvh_path_num, vector<vector<float>>& D, int Sn[], int n){
-//	float min_distance = 1.0;
-//	
-//	for(int i = 0; i < n; i++){
-//		if(D[bvh_path_num][Sn[i]]<min_distance){
-//			min_distance = D[bvh_path_num][Sn[i]];
-//		}
-//	}
-//
-//	return min_distance;
-//}
-//
-//int ofxDigitalDanceBvh::mat_dim(vector<vector<float>>& con_mat){
-//	cout << "次元数" << con_mat.size() << endl;
-//	cout << "列数" << con_mat[0].size() << endl;
-//	for (int i = 0; i < con_mat.size(); i++)
-//	{
-//		for (int j = 0; j < con_mat.size(); j++)
-//		{
-//			cout << con_mat[i][j] << " ";
-//		}
-//		cout << endl;
-//	}
-//	return con_mat.size();
-//}
+
+int ofxDigitalDanceBvh::GreedySampling(float q, float weighteffort[], float max_WE, vector<vector<float>>& D, int Sn[], int n, float rho) {
+	cout << D.size() << endl;
+
+	int bvh_path_num = 0; // 返り値の初期化
+	float max_score = 0.0; // 最大化したいスコア
+	
+	for(int i=0; i<D.size(); i++){
+		// すでにサンプルとして選ばれているデータ（Sn[]にあるデータ）は除く
+		bool overlapped_data = false;
+		for(int num_Sn = 0; num_Sn < n; num_Sn++){
+			if(i == Sn[num_Sn]){
+				overlapped_data = true;
+			}
+		}
+		if(overlapped_data){
+			continue;
+		}
+		
+		// すでに選ばれていなければ返すパス番号の探索に移る
+		if(max_score < (rho * rel_Music_WE(q, weighteffort[i], D.size()))+((1.0-rho) * phi_DistanceScore(i, D, Sn, n))){
+			bvh_path_num = i;
+			max_score = (rho * rel_Music_WE(q, weighteffort[i], D.size()))+((1.0-rho) * phi_DistanceScore(i, D, Sn, n));
+		}
+	}
+
+	return bvh_path_num;
+}
+
+float ofxDigitalDanceBvh::rel_Music_WE(float q, float weighteffort, float max_WE){
+	return 1.0 - ((q - weighteffort)/max_WE);
+}
+
+float ofxDigitalDanceBvh::phi_DistanceScore(int bvh_path_num, vector<vector<float>>& D, int Sn[], int n){
+	float min_distance = 1.0;
+	
+	for(int i = 0; i < n; i++){
+		if(D[bvh_path_num][Sn[i]]<min_distance){
+			min_distance = D[bvh_path_num][Sn[i]];
+		}
+	}
+
+	return min_distance;
+}
+
+int ofxDigitalDanceBvh::mat_dim(vector<vector<float>>& con_mat){
+	cout << "次元数" << con_mat.size() << endl;
+	cout << "列数" << con_mat[0].size() << endl;
+	for (int i = 0; i < con_mat.size(); i++)
+	{
+		for (int j = 0; j < con_mat.size(); j++)
+		{
+			cout << con_mat[i][j] << " ";
+		}
+		cout << endl;
+	}
+	return con_mat.size();
+}
