@@ -62,13 +62,13 @@ public:
     
     float rel_Music_WE(float q, float weighteffort, float max_WE);
     float phi_DistanceScore(int bvh_path_num, vector<vector<float>>& D, int Sn[], int n);
-    
-    void drawEllipsoid(ofPoint p1, ofPoint p2, float thickness);
-    
+        
 private:
     ofstream ofs;
     ofstream out;
     int mNumFrames;
+    void drawElipsoid(ofPoint p1, ofPoint p2, float thickness);
+
 };
 
 struct Node

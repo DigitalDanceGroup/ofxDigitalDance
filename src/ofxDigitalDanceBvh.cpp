@@ -86,10 +86,10 @@ void ofxDigitalDanceBvh::drawPerfume()
             
             if(i==1|| i==2 || i==3){
                 ofSetColor(ofColor::red);
-                this->drawEllipsoid(o->getPosition(), o->getChildren()[0]->getPosition(), 0.8);
+                this->drawElipsoid(o->getPosition(), o->getChildren()[0]->getPosition(), 0.8);
             }
             else
-                this->drawEllipsoid(o->getPosition(), o->getChildren()[0]->getPosition(), 0.3);
+                this->drawElipsoid(o->getPosition(), o->getChildren()[0]->getPosition(), 0.3);
         }
         else if (o->getChildren().size() > 1)
         {
@@ -103,7 +103,7 @@ void ofxDigitalDanceBvh::drawPerfume()
             
             for(int i=0; i<o->getChildren().size(); i++){
                 //ofDrawLine(o->getPosition(), o->getChildren()[i]->getPosition());
-                this->drawEllipsoid(o->getPosition(), o->getChildren()[i]->getPosition(), 1.0);
+                this->drawElipsoid(o->getPosition(), o->getChildren()[i]->getPosition(), 1.0);
             }
         }
         glPopMatrix();
@@ -149,12 +149,12 @@ void ofxDigitalDanceBvh::drawElipsoid()
         }
         else if (o->getChildren().size() == 1)
         {
-            this->drawEllipsoid(o->getPosition(), o->getChildren()[0]->getPosition(), 0.3);
+            this->drawElipsoid(o->getPosition(), o->getChildren()[0]->getPosition(), 0.3);
         }
         else if (o->getChildren().size() > 1)
         {
             for(int i=0; i<o->getChildren().size(); i++){
-                this->drawEllipsoid(o->getPosition(), o->getChildren()[i]->getPosition(), 0.5);
+                this->drawElipsoid(o->getPosition(), o->getChildren()[i]->getPosition(), 0.5);
             }
         }
         glPopMatrix();
@@ -1560,7 +1560,7 @@ void ofxDigitalDanceBvh::segmentationBVH_4C(string filename) {
 	}
 }
 
-void ofxDigitalDanceBvh::drawEllipsoid(ofPoint p1, ofPoint p2, float thickness)
+void ofxDigitalDanceBvh::drawElipsoid(ofPoint p1, ofPoint p2, float thickness)
 {
     ofPushMatrix();
     ofQuaternion q;
