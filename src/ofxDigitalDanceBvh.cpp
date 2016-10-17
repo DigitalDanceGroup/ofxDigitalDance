@@ -1014,6 +1014,15 @@ void ofxDigitalDanceBvh::LerpBVH(ofxDigitalDanceBvh* next, int range) {
 	}
 }
 
+float ofxDigitalDanceBvh::CubicInterpolate(float start, float stop, float amt) {
+    return ((-2.0)*(stop - start)*amt*amt*amt) + (3.0*(stop - start)*amt*amt) + start;
+};
+
+float ofxDigitalDanceBvh::calcInterpolateValue(const int p, const int range) {
+    assert(-1 < p && p < range);
+    return 2 * pow((p+1)/range, 3) - 3 * pow((p+1)/range, 2) + 1;
+}
+
 void ofxDigitalDanceBvh::CubicInterpolateBVH(ofxDigitalDanceBvh* next, int range) {
 	int ori_num_frames = this->num_frames;
 

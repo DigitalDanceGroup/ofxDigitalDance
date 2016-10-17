@@ -40,9 +40,8 @@ public:
     void LerpBVH(string filename1, string filename2, int range);
     void LerpBVH(ofxDigitalDanceBvh* next, int range);
 	void CubicInterpolateBVH(ofxDigitalDanceBvh* next, int range);
-    float CubicInterpolate(float start, float stop, float amt) {
-		return ((-2.0)*(stop - start)*amt*amt*amt) + (3.0*(stop - start)*amt*amt) + start;
-	};
+    float CubicInterpolate(float start, float stop, float amt);
+    float calcInterpolateValue(const int p, const int range);
 
 	float getConnectivity(ofxDigitalDanceBvh* next);
     void FillBlank(int num_seg, ofxDigitalDanceBvh bvhs[], int arraysize, int start = 0, int goal = 1);

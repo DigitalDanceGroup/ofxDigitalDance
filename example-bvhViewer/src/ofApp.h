@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxDigitalDance.h"
 
+using namespace mlib;
 class ofApp : public ofBaseApp{
 
 	public:
@@ -22,5 +23,6 @@ class ofApp : public ofBaseApp{
 
 		vector<ofxDigitalDanceBvh> bvh;
 		ofEasyCam cam;
+        ofLight light;
 		
 };

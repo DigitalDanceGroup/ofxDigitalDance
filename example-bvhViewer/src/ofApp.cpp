@@ -14,8 +14,7 @@ void ofApp::setup(){
 	bvh[1].load("kashiyuka.bvh");
 	bvh[2].load("nocchi.bvh");
 
-	for (int i = 0; i < bvh.size(); i++)
-	{
+    for (int i = 0; i < bvh.size(); i++) {
 		bvh[i].play();
 		bvh[i].setLoop(true);
 	}
@@ -23,37 +22,39 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-	for (int i = 0; i < bvh.size(); i++)
-	{
+	for (int i = 0; i < bvh.size(); i++) {
 		bvh[i].update();
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	glEnable(GL_DEPTH_TEST);
 
-	ofEnableBlendMode(OF_BLENDMODE_ALPHA);
+    ofEnableLighting();
+    ofEnableDepthTest();
+    light.enable();
+    light.setPosition(cam.getPosition());
+   
+    cam.begin();
 
-	cam.begin();
-
-	for (int i = 0; i < bvh.size(); i++)
-	{
-		bvh[i].draw();
+	for (int i = 0; i < bvh.size(); i++) {
+		bvh[i].drawPerfume();
 	}
 
 	cam.end();
+    
+    ofDisableDepthTest();
+    ofDisableLighting();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
-	switch (key)
-	{
-	case 'f':
-		ofToggleFullscreen();
-		break;
-	default:
-		break;
+	switch (key) {
+        case 'f':
+            ofToggleFullscreen();
+            break;
+        default:
+            break;
 	}
 }
 
