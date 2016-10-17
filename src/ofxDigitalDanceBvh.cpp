@@ -2,36 +2,6 @@
 
 using namespace mlib;
 
-static inline void billboard()
-{
-    GLfloat m[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, m);
-    
-    float inv_len;
-    
-    m[8] = -m[12];
-    m[9] = -m[13];
-    m[10] = -m[14];
-    inv_len = 1. / sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
-    m[8] *= inv_len;
-    m[9] *= inv_len;
-    m[10] *= inv_len;
-    
-    m[0] = -m[14];
-    m[1] = 0.0;
-    m[2] = m[12];
-    inv_len = 1. / sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
-    m[0] *= inv_len;
-    m[1] *= inv_len;
-    m[2] *= inv_len;
-    
-    m[4] = m[9] * m[2] - m[10] * m[1];
-    m[5] = m[10] * m[0] - m[8] * m[2];
-    m[6] = m[8] * m[1] - m[9] * m[0];
-    
-    glLoadMatrixf(m);
-}
-
 int ofxDigitalDanceBvh::getNumFrames()
 {
     mNumFrames = this->num_frames;
@@ -42,7 +12,6 @@ int ofxDigitalDanceBvh::getFrameSize()
 {
     return frames.size();
 }
-
 
 void ofxDigitalDanceBvh::update()
 {
@@ -1242,7 +1211,6 @@ void ofxDigitalDanceBvh::FillBlank(int num_seg, ofxDigitalDanceBvh bvhs[], int a
 		nodes[i].cost = -1.0;
 	}
 
-	cout << "経路探索中" << endl;
 	//goalから探索します
 	nodes[goal].cost = 0.0; //探索初めのノードのコストは0
 
@@ -1300,8 +1268,6 @@ void ofxDigitalDanceBvh::FillBlank(int num_seg, ofxDigitalDanceBvh bvhs[], int a
 }
 
 void ofxDigitalDanceBvh::FillBlank2(int num_seg, ofxDigitalDanceBvh bvhs[], vector<vector<float>>& con_mat, int arraysize, int start, int goal) {
-
-	cout << "ノードの設定中" << endl;
 
 	int size = (arraysize - 2) * num_seg; //全ノードの数-2
 	int size_interseg = arraysize - 2; //bvhsの数-2
@@ -1655,3 +1621,47 @@ void ofxDigitalDanceBvh::drawEllipsoid(ofPoint p1, ofPoint p2, float thickness)
 //	}
 //	return con_mat.size();
 //}
+
+int ofxDigitalDanceBvh::GreedySampling(float q, float weighteffort[], float max_WE, vector<vector<float>>& D, int Sn[], int n, float rho) {
+	cout << D.size() << endl;
+
+	int bvh_path_num = 0; // 返り値の初期化
+	float max_score = 0.0; // 最大化したいスコア
+	
+	for(int i=0; i<D.size(); i++){
+		// すでにサンプルとして選ばれているデータ（Sn[]にあるデータ）は除く
+		bool overlapped_data = false;
+		for(int num_Sn = 0; num_Sn < n; num_Sn++){
+			if(i == Sn[num_Sn]){
+				overlapped_data = true;
+			}
+		}
+		if(overlapped_data){
+			continue;
+		}
+		
+		// すでに選ばれていなければ返すパス番号の探索に移る
+		if(max_score < (rho * rel_Music_WE(q, weighteffort[i], D.size()))+((1.0-rho) * phi_DistanceScore(i, D, Sn, n))){
+			bvh_path_num = i;
+			max_score = (rho * rel_Music_WE(q, weighteffort[i], D.size()))+((1.0-rho) * phi_DistanceScore(i, D, Sn, n));
+		}
+	}
+
+	return bvh_path_num;
+}
+
+float ofxDigitalDanceBvh::rel_Music_WE(float q, float weighteffort, float max_WE){
+	return 1.0 - ((q - weighteffort)/max_WE);
+}
+
+float ofxDigitalDanceBvh::phi_DistanceScore(int bvh_path_num, vector<vector<float>>& D, int Sn[], int n)
+{
+	float min_distance = 1.0;
+	
+	for(int i = 0; i < n; i++){
+		if(D[bvh_path_num][Sn[i]]<min_distance){
+			min_distance = D[bvh_path_num][Sn[i]];
+		}
+	}
+	return min_distance;
+}

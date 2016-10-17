@@ -1,6 +1,6 @@
 # ofxDigitalDance
 
-This library is open source library to analysis human motion developed by Digital Dance Group.  
+This library is open sourceｃ library to analysis human motion developed by Digital Dance Group.  
 
 Feel free to use it and let us know what you think.  
 For more details about ofxDigitalDance, see <a href="http://research.mlabdance.com/">Digital Dance Group.</a>

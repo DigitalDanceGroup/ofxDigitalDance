@@ -43,7 +43,6 @@ public:
 		return ((-2.0)*(stop - start)*amt*amt*amt) + (3.0*(stop - start)*amt*amt) + start;
 	};
 
-	//òAåã
 	float getConnectivity(ofxDigitalDanceBvh* next);
     void FillBlank(int num_seg, ofxDigitalDanceBvh bvhs[], int arraysize, int start = 0, int goal = 1);
 	void FillBlank2(int num_seg, ofxDigitalDanceBvh bvhs[], vector<vector<float>>& con_mat, int arraysize, int start = 0, int goal = 1);
@@ -71,8 +70,6 @@ private:
     int mNumFrames;
 };
 
-
-//ÉmÅ[Éh
 struct Node
 {
 	std::vector<int> edges_to;
