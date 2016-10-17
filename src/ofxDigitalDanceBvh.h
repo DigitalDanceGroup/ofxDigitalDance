@@ -20,6 +20,7 @@ public:
 
     virtual void update();
     virtual void draw();
+    void drawElipsoid();
     void drawPerfume();
 
 	void exportAngulartoCSV(string filename);

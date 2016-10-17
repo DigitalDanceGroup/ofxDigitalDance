@@ -114,6 +114,7 @@ void ofxDigitalDanceBvh::drawPerfume()
 
 void ofxDigitalDanceBvh::draw()
 {
+    ofPushStyle();
     for (int i = 0; i < joints.size(); i++)
     {
         ofxBvhJoint *o = joints[i];
@@ -123,20 +124,37 @@ void ofxDigitalDanceBvh::draw()
         }
         else if (o->getChildren().size() == 1)
         {
-            //ofDrawLine(o->getPosition(), o->getChildren()[0]->getPosition());
-            if(!o->getChildren()[0]->isSite()){
-                ofDrawSphere(o->getPosition().x, o->getPosition().y, o->getPosition().z, 2.0f);
+            ofDrawLine(o->getPosition(), o->getChildren()[0]->getPosition());
+        }
+        else if (o->getChildren().size() > 1)
+        {
+            for(int i=0; i<o->getChildren().size(); i++){
+                ofDrawLine(o->getPosition(), o->getChildren()[i]->getPosition());
             }
-            
+        }
+        glPopMatrix();
+    }
+    ofPopStyle();
+    ofSetColor(ofColor::white);
+}
+
+void ofxDigitalDanceBvh::drawElipsoid()
+{
+    for (int i = 0; i < joints.size(); i++)
+    {
+        ofxBvhJoint *o = joints[i];
+        
+        if (o->isSite())
+        {
+        }
+        else if (o->getChildren().size() == 1)
+        {
             this->drawEllipsoid(o->getPosition(), o->getChildren()[0]->getPosition(), 0.3);
         }
         else if (o->getChildren().size() > 1)
         {
-            ofDrawSphere(o->getPosition().x, o->getPosition().y, o->getPosition().z, 3.0f);
-            
             for(int i=0; i<o->getChildren().size(); i++){
-                //ofDrawLine(o->getPosition(), o->getChildren()[i]->getPosition());
-                this->drawEllipsoid(o->getPosition(), o->getChildren()[i]->getPosition(), 0.7);
+                this->drawEllipsoid(o->getPosition(), o->getChildren()[i]->getPosition(), 0.5);
             }
         }
         glPopMatrix();
