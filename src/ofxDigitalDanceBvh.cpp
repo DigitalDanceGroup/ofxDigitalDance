@@ -1,5 +1,184 @@
 #include "ofxDigitalDanceBvh.h"
 
+using namespace mlib;
+
+static inline void billboard()
+{
+    GLfloat m[16];
+    glGetFloatv(GL_MODELVIEW_MATRIX, m);
+    
+    float inv_len;
+    
+    m[8] = -m[12];
+    m[9] = -m[13];
+    m[10] = -m[14];
+    inv_len = 1. / sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
+    m[8] *= inv_len;
+    m[9] *= inv_len;
+    m[10] *= inv_len;
+    
+    m[0] = -m[14];
+    m[1] = 0.0;
+    m[2] = m[12];
+    inv_len = 1. / sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
+    m[0] *= inv_len;
+    m[1] *= inv_len;
+    m[2] *= inv_len;
+    
+    m[4] = m[9] * m[2] - m[10] * m[1];
+    m[5] = m[10] * m[0] - m[8] * m[2];
+    m[6] = m[8] * m[1] - m[9] * m[0];
+    
+    glLoadMatrixf(m);
+}
+
+int ofxDigitalDanceBvh::getNumFrames()
+{
+    mNumFrames = this->num_frames;
+    return mNumFrames;
+}
+
+int ofxDigitalDanceBvh::getFrameSize()
+{
+    return frames.size();
+}
+
+
+void ofxDigitalDanceBvh::update()
+{
+    frame_new = false;
+    
+    if (playing && ofGetFrameNum() > 1)
+    {
+        int last_index = getFrame();
+        
+        play_head += ofGetLastFrameTime() * rate;
+        int index = getFrame();
+        
+        if (index != last_index)
+        {
+            need_update = true;
+            
+            if(index < frames.size())
+                currentFrame = frames[index];
+            
+            if (index >= frames.size())
+            {
+                if (loop)
+                    play_head = 0;
+                else
+                    playing = false;
+            }
+            
+            if (play_head < 0)
+                play_head = 0;
+        }
+    }
+    
+    if (need_update)
+    {
+        need_update = false;
+        frame_new = true;
+        
+        int index = 0;
+        updateJoint(index, currentFrame, root);
+    }
+}
+
+
+void ofxDigitalDanceBvh::drawPerfume()
+{
+    for (int i = 0; i < joints.size(); i++)
+    {
+        ofxBvhJoint *o = joints[i];
+        
+        if (o->isSite())
+        {
+        }
+        else if (o->getChildren().size() == 1)
+        {
+            if(i<6 || (i>7 && i<9) || i==13){
+                ofSetColor(ofColor::red);
+            }
+            else if(i>16 && i<31){
+                ofSetColor(ofColor::blue);
+            }
+            else{
+                ofSetColor(ofColor(225, 165, 135));
+            }
+            
+            //ofDrawLine(o->getPosition(), o->getChildren()[0]->getPosition());
+            if(!o->getChildren()[0]->isSite()){
+                if(i==9 || i==14){
+                    ofSetColor(ofColor::red);
+                }
+                ofDrawSphere(o->getPosition().x, o->getPosition().y, o->getPosition().z, 4.0f);
+            }
+            
+            if(i==1|| i==2 || i==3){
+                ofSetColor(ofColor::red);
+                this->drawEllipsoid(o->getPosition(), o->getChildren()[0]->getPosition(), 0.8);
+            }
+            else
+                this->drawEllipsoid(o->getPosition(), o->getChildren()[0]->getPosition(), 0.3);
+        }
+        else if (o->getChildren().size() > 1)
+        {
+            if(i==0)
+                ofSetColor(ofColor::blue);
+            else
+                ofSetColor(ofColor::red);
+            
+            
+            ofDrawSphere(o->getPosition().x, o->getPosition().y, o->getPosition().z, 3.0f);
+            
+            for(int i=0; i<o->getChildren().size(); i++){
+                //ofDrawLine(o->getPosition(), o->getChildren()[i]->getPosition());
+                this->drawEllipsoid(o->getPosition(), o->getChildren()[i]->getPosition(), 1.0);
+            }
+        }
+        glPopMatrix();
+    }
+    
+    ofSetColor(ofColor::white);
+}
+
+void ofxDigitalDanceBvh::draw()
+{
+    for (int i = 0; i < joints.size(); i++)
+    {
+        ofxBvhJoint *o = joints[i];
+        
+        if (o->isSite())
+        {
+        }
+        else if (o->getChildren().size() == 1)
+        {
+            //ofDrawLine(o->getPosition(), o->getChildren()[0]->getPosition());
+            if(!o->getChildren()[0]->isSite()){
+                ofDrawSphere(o->getPosition().x, o->getPosition().y, o->getPosition().z, 2.0f);
+            }
+            
+            this->drawEllipsoid(o->getPosition(), o->getChildren()[0]->getPosition(), 0.3);
+        }
+        else if (o->getChildren().size() > 1)
+        {
+            ofDrawSphere(o->getPosition().x, o->getPosition().y, o->getPosition().z, 3.0f);
+            
+            for(int i=0; i<o->getChildren().size(); i++){
+                //ofDrawLine(o->getPosition(), o->getChildren()[i]->getPosition());
+                this->drawEllipsoid(o->getPosition(), o->getChildren()[i]->getPosition(), 0.7);
+            }
+        }
+        glPopMatrix();
+    }
+    ofSetColor(ofColor::white);
+}
+
+float ofxDigitalDanceBvh::getFrameTime()
+{
+    return frame_time;
+}
 
 void ofxDigitalDanceBvh::setTransRotate(ofVec3f root_pos, ofQuaternion *q)
 {
@@ -1395,6 +1574,27 @@ void ofxDigitalDanceBvh::segmentationBVH_4C(string filename) {
 
 		ofs.close();
 	}
+}
+
+void ofxDigitalDanceBvh::drawEllipsoid(ofPoint p1, ofPoint p2, float thickness)
+{
+    ofPushMatrix();
+    ofQuaternion q;
+    ofVec3f v1(1,0,0);
+    ofVec3f v2 = p2 - p1;
+    q.makeRotate(v1, v2);
+    q.normalize();
+    
+    float length = (p2-p1).length();
+    float angle, x, y, z;
+    q.getRotate(angle, x, y, z);
+
+    ofTranslate(p1);
+    ofRotate(angle, x, y, z);
+    ofScale(1.0, thickness, thickness);
+    
+    ofDrawSphere(length/2, 0, length/2);
+    ofPopMatrix();
 }
 
 //
