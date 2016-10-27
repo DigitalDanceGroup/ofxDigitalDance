@@ -13,35 +13,58 @@ public:
     ofxDigitalDanceBvh();
     ~ofxDigitalDanceBvh();
     
+    ///-------------------
+    /// getter
+    ///-------------------
     int getNumFrames();
     int getFrameSize();
+    float getWeightEffort();
+    float getVelAve();
+    float getFrameTime();
+    float getConnectivity(ofxDigitalDanceBvh* next);
 
-    // export function
-	void exportBvh(string filename);
-    void exportScaledOffset(string filename, float scale);
-    //vector<vector<double>> ofxBvh::exportAngular();
+    ///-------------------
+    /// setter
+    ///-------------------
+    void setTransRotate(ofVec3f root_pos, ofQuaternion *q);
+    
+    /*
+     @ description
+     For setting input motion at arbitrary frame.
+     @ parameter
+     motion: arbitrary motion
+     frame:  frame number which you want to set
+     */
+    void setMotionFrame(ofxDigitalDanceBvh& motion, const int frame);
 
+    ///-------------------
+    /// update
+    ///-------------------
     virtual void update();
+    
+    ///-------------------
+    /// draw
+    ///-------------------
     virtual void draw();
     void drawElipsoid();
     void drawPerfume();
     void drawMixMotion(ofxDigitalDanceBvh *next, float value, ofQuaternion& quat, ofVec3f& trans);
     void drawMixMotion(ofxDigitalDanceBvh *next, float value, ofQuaternion& quat1, ofVec3f& trans1, ofQuaternion& quat2, ofVec3f& trans2);
 
-	void exportAngulartoCSV(string filename);
+    ///-------------------
+    /// exporter
+    ///-------------------
+    void exportBvh(string filename);
+    void exportScaledOffset(string filename, float scale);
+    void exportFrameBVH(const string &filename, int start, int end, float scale);
+    void exportAngulartoCSV(string filename);
     void exportAngulartoTXT(string filename);
     void exportAngularVelocity(string filename);
-    float getWeightEffort();
-    float getVelAve();
-    float getFrameTime();
+    //vector<vector<double>> ofxBvh::exportAngular();
     
-    float comparePose(ofxDigitalDanceBvh *next, ofQuaternion &quat, ofVec3f &trans);
-    
-	void childroop(const ofxBvhJoint* joint, string str);
-    void childroopScaledOffset(const ofxBvhJoint* joint, string str, float scale);
-    void Resampling(const float frametime, string filename);
-				
-    // Interpolation
+    ///-------------------
+    /// interpolation
+    ///-------------------
     void InterpolatePush(string filename, ofxDigitalDanceBvh* next, int range);
     void InterpolateAttitude(string filename, ofxDigitalDanceBvh* next, int range);
     void LerpBVH(string filename1, string filename2, int range);
@@ -51,31 +74,66 @@ public:
     float CubicInterpolate(float start, float stop, float amt);
     static float calcInterpolateValue(const float& p, const float& range);
 
-	float getConnectivity(ofxDigitalDanceBvh* next);
-    void FillBlank(int num_seg, ofxDigitalDanceBvh bvhs[], int arraysize, int start = 0, int goal = 1);
-	void FillBlank2(int num_seg, ofxDigitalDanceBvh bvhs[], vector<vector<float>>& con_mat, int arraysize, int start = 0, int goal = 1);
+    /*
+    @ description
+        If you want to make connect two motion smoothly without records, you can use this function.
+        before you use this, you should set both motion at arbitrary frame(you can use func:setMotionFrame)
+        <---previous---current---next--->
+    @ parameter
+        current:      current pose
+        next:         next pose
+        previousMat:  matrix of root pose when previous motion start 
+    */
+    const ofMatrix4x4 calcTrackPoseMatrix(ofxDigitalDanceBvh& current,
+                                          ofxDigitalDanceBvh& next,
+                                          const ofMatrix4x4& previousMat );
     
-	void motionInitialize();
-	void setTransRotate(ofVec3f root_pos, ofQuaternion *q);
-	void exportFrameBVH(const string &filename, int start, int end, float scale);
-    void DFSJoint(ofxBvhJoint *joint, string blank, float scale);
-
-	// segmentation
+    ///-------------------
+    /// segmentation
+    ///-------------------
     void segmentationBVH(string filename, int rows, double data[]);
     void segmentationBVH_4C(string filename);
     
-    // Sampling
-	int GreedySampling(float q, float weighteffort[], float max_WE, vector<vector<float>>& D, int Sn[], int n, float rho = 1.0);
+    ///-------------------
+    /// Sampling
+    ///-------------------
+    int GreedySampling(float q, float weighteffort[], float max_WE, vector<vector<float>>& D, int Sn[], int n, float rho = 1.0);
+    void Resampling(const float frametime, string filename);
+
+    ///-------------------
+    /// fill brank
+    ///-------------------
+    void FillBlank(int num_seg, ofxDigitalDanceBvh bvhs[], int arraysize, int start = 0, int goal = 1);
+    void FillBlank2(int num_seg, ofxDigitalDanceBvh bvhs[], vector<vector<float>>& con_mat, int arraysize, int start = 0, int goal = 1);
+
+    ///-------------------
+    /// loop
+    ///-------------------
+    void childroop(const ofxBvhJoint* joint, string str);
+    void childroopScaledOffset(const ofxBvhJoint* joint, string str, float scale);
+    void DFSJoint(ofxBvhJoint *joint, string blank, float scale);
     
+    ///-------------------
+    /// compate pose
+    ///-------------------
+    float comparePose(ofxDigitalDanceBvh *next, ofQuaternion &quat, ofVec3f &trans);
+
+    ///-------------------
+    /// specfic function
+    ///-------------------
+	void motionInitialize();
     float rel_Music_WE(float q, float weighteffort, float max_WE);
     float phi_DistanceScore(int bvh_path_num, vector<vector<float>>& D, int Sn[], int n);
         
 private:
+    
+    /// variable
     ofstream ofs;
     ofstream out;
     int mNumFrames;
+    
+    /// function
     void drawElipsoid(ofPoint p1, ofPoint p2, float thickness);
-
 };
 
 struct Node
