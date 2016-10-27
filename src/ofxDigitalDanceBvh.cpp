@@ -15,24 +15,23 @@ ofxDigitalDanceBvh::~ofxDigitalDanceBvh()
 /// getter
 ///-------------------
 
-int ofxDigitalDanceBvh::getNumFrames()
+const int ofxDigitalDanceBvh::getNumFrames() const
 {
-    mNumFrames = this->num_frames;
-    return mNumFrames;
+    return this->num_frames;
 }
 
-int ofxDigitalDanceBvh::getFrameSize()
+const int ofxDigitalDanceBvh::getFrameSize() const
 {
     return frames.size();
 }
 
-float ofxDigitalDanceBvh::getFrameTime()
+const float ofxDigitalDanceBvh::getFrameTime() const
 {
     return frame_time;
 }
 
 // ä÷êﬂäpìxÇ≈åÉÇµÇ≥ÇåvéZ
-float ofxDigitalDanceBvh::getWeightEffort() {
+const float ofxDigitalDanceBvh::getWeightEffort() {
     float weighteffort_total = 0.0;
     for (int i = 1; i<this->num_frames; i++)
     {
@@ -64,7 +63,7 @@ float ofxDigitalDanceBvh::getWeightEffort() {
 }
 
 // ä÷êﬂà íuÇÃë¨Ç≥Ç≈åÉÇµÇ≥ÇåvéZ
-float ofxDigitalDanceBvh::getVelAve() {
+const float ofxDigitalDanceBvh::getVelAve() {
     float vel_total = 0.0;
     for (int i = 1; i<this->num_frames; i++)
     {
@@ -93,7 +92,7 @@ float ofxDigitalDanceBvh::getVelAve() {
 }
 
 
-float ofxDigitalDanceBvh::getConnectivity(ofxDigitalDanceBvh* next) {
+const float ofxDigitalDanceBvh::getConnectivity(ofxDigitalDanceBvh* next) {
     float Sim_pose = 0.0; //épê®óﬁéóìx
     float Sim_move = 0.0; //ìÆÇ´óﬁéóìx
     
@@ -151,10 +150,10 @@ float ofxDigitalDanceBvh::getConnectivity(ofxDigitalDanceBvh* next) {
 /// setter
 ///-------------------
 
-void ofxDigitalDanceBvh::setMotionFrame(ofxDigitalDanceBvh& motion, const int frame)
+void ofxDigitalDanceBvh::setFrame(int frame)
 {
-    motion.setFrame(frame);
-    motion.update();
+    ofxBvh::setFrame(frame);
+    this->update();
 }
 
 void ofxDigitalDanceBvh::setTransRotate(ofVec3f root_pos, ofQuaternion *q)
@@ -228,6 +227,31 @@ void ofxDigitalDanceBvh::update()
 /// draw
 ///-------------------
 
+void ofxDigitalDanceBvh::drawLine()
+{
+    ofPushStyle();
+    for (int i = 0; i < joints.size(); i++)
+    {
+        ofxBvhJoint *o = joints[i];
+        
+        if (o->isSite())
+        {
+        }
+        else if (o->getChildren().size() == 1)
+        {
+            ofDrawLine(o->getPosition(), o->getChildren()[0]->getPosition());
+        }
+        else if (o->getChildren().size() > 1)
+        {
+            for(int i=0; i<o->getChildren().size(); i++){
+                ofDrawLine(o->getPosition(), o->getChildren()[i]->getPosition());
+            }
+        }
+    }
+    ofPopStyle();
+    ofSetColor(ofColor::white);
+}
+
 void ofxDigitalDanceBvh::drawPerfume()
 {
     for (int i = 0; i < joints.size(); i++)
@@ -289,6 +313,16 @@ void ofxDigitalDanceBvh::drawPerfume()
 
 
 void ofxDigitalDanceBvh::drawMixMotion(ofxDigitalDanceBvh *next, float value,
+                                       ofQuaternion& quat, ofVec3f& trans)
+{
+    ofVec3f trans1;
+    trans1.zero();
+    ofQuaternion quat1;
+    quat1.zeroRotation();
+    this->drawMixMotion(next, value, quat1, trans1, quat, trans);
+}
+
+void ofxDigitalDanceBvh::drawMixMotion(ofxDigitalDanceBvh *next, float value,
                                        ofQuaternion& quat1, ofVec3f& trans1,
                                        ofQuaternion& quat2, ofVec3f& trans2  )
 {
@@ -323,71 +357,6 @@ void ofxDigitalDanceBvh::drawMixMotion(ofxDigitalDanceBvh *next, float value,
         }
         glPopMatrix();
     }
-    ofSetColor(ofColor::white);
-}
-
-void ofxDigitalDanceBvh::drawMixMotion(ofxDigitalDanceBvh *next, float value, ofQuaternion& quat, ofVec3f& trans)
-{
-//    ofVec3f trans;
-//    ofQuaternion quat;
-//    this->comparePose(next, quat, trans);
-//    
-    for (int i = 0; i < joints.size(); i++)
-    {
-        glPushMatrix();
-        ofxBvhJoint *o = joints[i];
-        if (o->isSite())
-        {
-        }
-        else if (o->getChildren().size() == 1)
-        {
-            ofPoint middle = (value * o->getPosition() +
-                            (1.0f - value) * (quat * next->getJoint(i)->getPosition() + trans) );
-            
-            ofPoint childMiddle = (value * o->getChildren()[0]->getPosition() +
-                            (1.0f - value) * (quat * next->getJoint(i)->getChildren()[0]->getPosition() + trans));
-            
-            this->drawElipsoid(middle, childMiddle, 0.3);
-        }
-        else if (o->getChildren().size() > 1)
-        {
-            ofPoint middle = (value * o->getPosition() +
-                              (1.0f - value) * (quat * next->getJoint(i)->getPosition() + trans ));
-            for(int j=0; j<o->getChildren().size(); j++){
-                ofPoint childMiddle =
-                            (value * o->getChildren()[j]->getPosition() +
-                            (1.0f - value) * (quat * next->getJoint(i)->getChildren()[j]->getPosition() + trans ) );
-                
-                this->drawElipsoid(middle, childMiddle, 0.3);
-            }
-        }
-        glPopMatrix();
-    }
-    ofSetColor(ofColor::white);
-}
-
-void ofxDigitalDanceBvh::draw()
-{
-    ofPushStyle();
-    for (int i = 0; i < joints.size(); i++)
-    {
-        ofxBvhJoint *o = joints[i];
-        
-        if (o->isSite())
-        {
-        }
-        else if (o->getChildren().size() == 1)
-        {
-            ofDrawLine(o->getPosition(), o->getChildren()[0]->getPosition());
-        }
-        else if (o->getChildren().size() > 1)
-        {
-            for(int i=0; i<o->getChildren().size(); i++){
-                ofDrawLine(o->getPosition(), o->getChildren()[i]->getPosition());
-            }
-        }
-    }
-    ofPopStyle();
     ofSetColor(ofColor::white);
 }
 

@@ -16,12 +16,12 @@ public:
     ///-------------------
     /// getter
     ///-------------------
-    int getNumFrames();
-    int getFrameSize();
-    float getWeightEffort();
-    float getVelAve();
-    float getFrameTime();
-    float getConnectivity(ofxDigitalDanceBvh* next);
+    const int getNumFrames() const;
+    const int getFrameSize() const;
+    const float getFrameTime() const;
+    const float getWeightEffort();
+    const float getVelAve();
+    const float getConnectivity(ofxDigitalDanceBvh* next);
 
     ///-------------------
     /// setter
@@ -30,12 +30,11 @@ public:
     
     /*
      @ description
-     For setting input motion at arbitrary frame.
+        For setting at arbitrary frame.
      @ parameter
-     motion: arbitrary motion
-     frame:  frame number which you want to set
+        frame:  frame number which you want to set
      */
-    void setMotionFrame(ofxDigitalDanceBvh& motion, const int frame);
+    virtual void setFrame(int frame);
 
     ///-------------------
     /// update
@@ -45,9 +44,30 @@ public:
     ///-------------------
     /// draw
     ///-------------------
-    virtual void draw();
+    
+    /*
+     @ description
+        draw skelton using line
+     */
+    void drawLine();
+    
+    /*
+     @ description
+        draw skelton using drawing elipsoid <- also private function
+     */
     void drawElipsoid();
+
+    /*
+     @ description
+        draw bone using elipsoid with color for perfume motion data
+     */
     void drawPerfume();
+    
+    /*
+     @ description
+        draw skeleton using elipsoid with blending two motion
+     @ parameter
+     */
     void drawMixMotion(ofxDigitalDanceBvh *next, float value, ofQuaternion& quat, ofVec3f& trans);
     void drawMixMotion(ofxDigitalDanceBvh *next, float value, ofQuaternion& quat1, ofVec3f& trans1, ofQuaternion& quat2, ofVec3f& trans2);
 
@@ -84,9 +104,9 @@ public:
         next:         next pose
         previousMat:  matrix of root pose when previous motion start 
     */
-    const ofMatrix4x4 calcTrackPoseMatrix(ofxDigitalDanceBvh& current,
-                                          ofxDigitalDanceBvh& next,
-                                          const ofMatrix4x4& previousMat );
+    static const ofMatrix4x4 calcTrackPoseMatrix(ofxDigitalDanceBvh& current,
+                                                 ofxDigitalDanceBvh& next,
+                                                 const ofMatrix4x4& previousMat );
     
     ///-------------------
     /// segmentation
@@ -130,7 +150,6 @@ private:
     /// variable
     ofstream ofs;
     ofstream out;
-    int mNumFrames;
     
     /// function
     void drawElipsoid(ofPoint p1, ofPoint p2, float thickness);
