@@ -16,6 +16,13 @@ public:
     ///-------------------
     /// getter
     ///-------------------
+    /*
+    @ description
+        ofxBvh::getFrame has a bug which return a frame number over num of frames.
+        We fixed to return last frame then.
+     */
+    virtual const int getFrame() const;
+    
     const int getNumFrames() const;
     const int getFrameSize() const;
     const float getFrameTime() const;

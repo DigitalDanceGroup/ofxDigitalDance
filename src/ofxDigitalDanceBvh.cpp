@@ -15,6 +15,16 @@ ofxDigitalDanceBvh::~ofxDigitalDanceBvh()
 /// getter
 ///-------------------
 
+const int ofxDigitalDanceBvh::getFrame() const
+{
+    int frame = floor(play_head / frame_time);
+    
+    if( frame >= this->getNumFrames())
+        return this->getNumFrames()-1;
+    else
+        return frame;
+}
+
 const int ofxDigitalDanceBvh::getNumFrames() const
 {
     return this->num_frames;
