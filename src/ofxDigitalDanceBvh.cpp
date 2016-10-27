@@ -2,6 +2,15 @@
 
 using namespace mlib;
 
+ofxDigitalDanceBvh::ofxDigitalDanceBvh()
+{
+    
+}
+ofxDigitalDanceBvh::~ofxDigitalDanceBvh()
+{
+    
+}
+
 int ofxDigitalDanceBvh::getNumFrames()
 {
     mNumFrames = this->num_frames;
@@ -61,6 +70,8 @@ void ofxDigitalDanceBvh::drawPerfume()
     {
         ofxBvhJoint *o = joints[i];
         
+        glPushMatrix();
+        
         if (o->isSite())
         {
         }
@@ -101,14 +112,93 @@ void ofxDigitalDanceBvh::drawPerfume()
             
             ofDrawSphere(o->getPosition().x, o->getPosition().y, o->getPosition().z, 3.0f);
             
-            for(int i=0; i<o->getChildren().size(); i++){
+            for(int j=0; j<o->getChildren().size(); j++){
                 //ofDrawLine(o->getPosition(), o->getChildren()[i]->getPosition());
-                this->drawElipsoid(o->getPosition(), o->getChildren()[i]->getPosition(), 1.0);
+                this->drawElipsoid(o->getPosition(), o->getChildren()[j]->getPosition(), 1.0);
             }
         }
         glPopMatrix();
     }
     
+    ofSetColor(ofColor::white);
+}
+
+
+void ofxDigitalDanceBvh::drawMixMotion(ofxDigitalDanceBvh *next, float value,
+                                       ofQuaternion& quat1, ofVec3f& trans1,
+                                       ofQuaternion& quat2, ofVec3f& trans2  )
+{
+    for (int i = 0; i < joints.size(); i++)
+    {
+        glPushMatrix();
+        ofxBvhJoint *o = joints[i];
+        if (o->isSite())
+        {
+        }
+        else if (o->getChildren().size() == 1)
+        {
+            ofPoint middle = (value * (quat1 * o->getPosition() + trans1) +
+                              (1.0f - value) * (quat2 * next->getJoint(i)->getPosition() + trans2) );
+            
+            ofPoint childMiddle = (value * (quat1 * o->getChildren()[0]->getPosition() + trans1) +
+                                   (1.0f - value) * (quat2 * next->getJoint(i)->getChildren()[0]->getPosition() + trans2));
+            
+            this->drawElipsoid(middle, childMiddle, 0.3);
+        }
+        else if (o->getChildren().size() > 1)
+        {
+            ofPoint middle = (value * (quat1 * o->getPosition() + trans1) +
+                              (1.0f - value) * (quat2 * next->getJoint(i)->getPosition() + trans2 ));
+            for(int j=0; j<o->getChildren().size(); j++){
+                ofPoint childMiddle =
+                (value * (quat1 * o->getChildren()[j]->getPosition() + trans1) +
+                 (1.0f - value) * (quat2 * next->getJoint(i)->getChildren()[j]->getPosition() + trans2 ) );
+                
+                this->drawElipsoid(middle, childMiddle, 0.3);
+            }
+        }
+        glPopMatrix();
+    }
+    ofSetColor(ofColor::white);
+}
+
+void ofxDigitalDanceBvh::drawMixMotion(ofxDigitalDanceBvh *next, float value, ofQuaternion& quat, ofVec3f& trans)
+{
+//    ofVec3f trans;
+//    ofQuaternion quat;
+//    this->comparePose(next, quat, trans);
+//    
+    for (int i = 0; i < joints.size(); i++)
+    {
+        glPushMatrix();
+        ofxBvhJoint *o = joints[i];
+        if (o->isSite())
+        {
+        }
+        else if (o->getChildren().size() == 1)
+        {
+            ofPoint middle = (value * o->getPosition() +
+                            (1.0f - value) * (quat * next->getJoint(i)->getPosition() + trans) );
+            
+            ofPoint childMiddle = (value * o->getChildren()[0]->getPosition() +
+                            (1.0f - value) * (quat * next->getJoint(i)->getChildren()[0]->getPosition() + trans));
+            
+            this->drawElipsoid(middle, childMiddle, 0.3);
+        }
+        else if (o->getChildren().size() > 1)
+        {
+            ofPoint middle = (value * o->getPosition() +
+                              (1.0f - value) * (quat * next->getJoint(i)->getPosition() + trans ));
+            for(int j=0; j<o->getChildren().size(); j++){
+                ofPoint childMiddle =
+                            (value * o->getChildren()[j]->getPosition() +
+                            (1.0f - value) * (quat * next->getJoint(i)->getChildren()[j]->getPosition() + trans ) );
+                
+                this->drawElipsoid(middle, childMiddle, 0.3);
+            }
+        }
+        glPopMatrix();
+    }
     ofSetColor(ofColor::white);
 }
 
@@ -132,7 +222,6 @@ void ofxDigitalDanceBvh::draw()
                 ofDrawLine(o->getPosition(), o->getChildren()[i]->getPosition());
             }
         }
-        glPopMatrix();
     }
     ofPopStyle();
     ofSetColor(ofColor::white);
@@ -142,6 +231,7 @@ void ofxDigitalDanceBvh::drawElipsoid()
 {
     for (int i = 0; i < joints.size(); i++)
     {
+        glPushMatrix();
         ofxBvhJoint *o = joints[i];
         
         if (o->isSite())
@@ -911,16 +1001,14 @@ void ofxDigitalDanceBvh::LerpBVH(string filename1, string filename2, int range) 
 void ofxDigitalDanceBvh::LerpBVH(ofxDigitalDanceBvh* next, int range) {
 	int ori_num_frames = this->num_frames;
 
-	//連結部の前rangeフレーム分の書き換え
+	// re-write range frame part of connection part
 	for (int i = 0; i < range - 1; i++) {
 		for (int j = 0; j < this->frames.at(i).size(); j++) {
 			if (j == 0 || j == 2) {
 				continue;
 			}
 			else {
-				//その他のパラメータを線形補間
-				ofxDigitalDanceBvh bvhh;
-				bvhh.setFrame(10);
+				// linear blending for other parameter
 				if (abs(this->frames.at(ori_num_frames - range).at(j) - next->frames.at(range - 1).at(j)) > 180.0) {
 					if (this->frames.at(ori_num_frames - range).at(j) < 0.0) {
 						float newstart = 360.0 + this->frames.at(ori_num_frames - range).at(j);
@@ -947,7 +1035,7 @@ void ofxDigitalDanceBvh::LerpBVH(ofxDigitalDanceBvh* next, int range) {
 		}
 	}
 
-	//連結部の後rangeフレーム分の書き換え
+	// re-write in range frame after connection part
 	for (int i = 0; i < next->num_frames; i++)
 	{
 		FrameData data; //bvhの((bvh1のフレーム数)+(i+1))番目のフレームのデータ
@@ -1014,13 +1102,120 @@ void ofxDigitalDanceBvh::LerpBVH(ofxDigitalDanceBvh* next, int range) {
 	}
 }
 
+void ofxDigitalDanceBvh::LerpBVH(ofxDigitalDanceBvh *next, int range, float interpolate,
+                                 int startFrame1, int endFrame1,
+                                 int startFrame2, int endFrame3)
+{
+    int ori_num_frames = this->num_frames;
+    
+    // re-write range frame part of connection part
+    for (int i = 0; i < range - 1; i++) {
+        for (int j = 0; j < this->frames.at(i).size(); j++) {
+            if (j == 0 || j == 2) {
+                continue;
+            }
+            else {
+                // linear blending for other parameter
+                if (abs(this->frames.at(ori_num_frames - range).at(j) - next->frames.at(range - 1).at(j)) > 180.0) {
+                    if (this->frames.at(ori_num_frames - range).at(j) < 0.0) {
+                        float newstart = 360.0 + this->frames.at(ori_num_frames - range).at(j);
+                        float v = ofLerp(newstart, next->frames.at(range - 1).at(j), ((float)range - (float)i - 1.0) / (((float)range*2.0) - 1.0));
+                        if (v > 180.0) {
+                            v = v - 360.0;
+                        }
+                        this->frames.at((this->num_frames - 1) - i).at(j) = v;
+                    }
+                    else/* if(next->frames.at(range-1).at(j) < 0)*/ {
+                        float newend = 360.0 + next->frames.at(range - 1).at(j);
+                        float v = ofLerp(this->frames.at(ori_num_frames - range).at(j), newend, ((float)range - (float)i - 1.0) / (((float)range*2.0) - 1.0));
+                        if (v > 180.0) {
+                            v = v - 360.0;
+                        }
+                        this->frames.at((this->num_frames - 1) - i).at(j) = v;
+                    }
+                }
+                else {
+                    float v = ofLerp(this->frames.at(ori_num_frames - range).at(j), next->frames.at(range - 1).at(j), ((float)range - (float)i - 1.0) / (((float)range*2.0) - 1.0));
+                    this->frames.at((this->num_frames - 1) - i).at(j) = v;
+                }
+            }
+        }
+    }
+    
+    // re-write in range frame after connection part
+    for (int i = 0; i < next->num_frames; i++)
+    {
+        FrameData data; //bvhの((bvh1のフレーム数)+(i+1))番目のフレームのデータ
+        // range内ではx,zの位置座標補正と、その他のすべてのパラメータを線形補間
+        if (i < range - 1) {
+            int j = 0;
+            for (j = 0; j < next->frames.at(i).size() - 1; j++) {
+                if (j == 0 || j == 2) {
+                    // x, zの位置座標はすべてのフレームで変換
+                    float v = next->frames.at(i).at(j) - (next->frames.at(0).at(j) - this->frames.at(ori_num_frames - 1).at(j));
+                    data.push_back(v);
+                }
+                else {
+                    // その他のパラメータを線形補間
+                    // MOTIONのパラメータは[-180, 180]degreeなので補正が必要
+                    if (abs(this->frames.at(ori_num_frames - range).at(j) - next->frames.at(range - 1).at(j)) > 180.0) {
+                        if (this->frames.at(ori_num_frames - range).at(j) < 0.0) {
+                            float newstart = 360.0 + this->frames.at(ori_num_frames - range).at(j);
+                            float v = ofLerp(newstart, next->frames.at(range - 1).at(j), ((float)range + (float)i) / (((float)range*2.0) - 1.0));
+                            if (v > 180.0) {
+                                v = v - 360.0;
+                            }
+                            data.push_back(v);
+                        }
+                        else/* if(next->frames.at(range-1).at(j) < 0)*/ {
+                            float newend = 360.0 + next->frames.at(range - 1).at(j);
+                            float v = ofLerp(this->frames.at(ori_num_frames - range).at(j), newend, ((float)range + (float)i) / (((float)range*2.0) - 1.0));
+                            if (v > 180.0) {
+                                v = v - 360.0;
+                            }
+                            data.push_back(v);
+                        }
+                    }
+                    else {
+                        float v = ofLerp(this->frames.at(ori_num_frames - range).at(j), next->frames.at(range - 1).at(j), ((float)range + (float)i) / (((float)range*2.0) - 1.0));
+                        data.push_back(v);
+                    }
+                }
+            }
+            float v = ofLerp(this->frames.at(ori_num_frames - range).at(j), next->frames.at(range - 1).at(j), ((float)range + (float)i) / (((float)range*2.0) - 1.0));
+            data.push_back(v);
+        }
+        
+        // range外でもx,zの位置座標補正はするが、その他のすべてのパラメータはそのままの値
+        else {
+            int j = 0;
+            for (j = 0; j<next->frames.at(i).size() - 1; j++) {
+                if (j == 0/*||j==1*/ || j == 2) {
+                    // x,zの位置座標はすべてのフレームで変換
+                    float v = next->frames.at(i).at(j) - (next->frames.at(0).at(j) - this->frames.at(ori_num_frames - 1).at(j));
+                    data.push_back(v);
+                }
+                else {
+                    // その他のパラメータはそのまま
+                    float v = next->frames.at(i).at(j);
+                    data.push_back(v);
+                }
+            }
+            float v = next->frames.at(i).at(j);
+            data.push_back(v);
+        }
+        frames.push_back(data);
+        this->num_frames++;
+    }
+}
+
 float ofxDigitalDanceBvh::CubicInterpolate(float start, float stop, float amt) {
     return ((-2.0)*(stop - start)*amt*amt*amt) + (3.0*(stop - start)*amt*amt) + start;
 };
 
-float ofxDigitalDanceBvh::calcInterpolateValue(const int p, const int range) {
-    assert(-1 < p && p < range);
-    return 2 * pow((p+1)/range, 3) - 3 * pow((p+1)/range, 2) + 1;
+float ofxDigitalDanceBvh::calcInterpolateValue(const float& p, const float& range) {
+    assert(-1.1f < p && p < range);
+    return 2.0f * pow((p+1.0f)/range, 3) - 3.0f * pow((p+1.0f)/range, 2) + 1.0f;
 }
 
 void ofxDigitalDanceBvh::CubicInterpolateBVH(ofxDigitalDanceBvh* next, int range) {
@@ -1691,4 +1886,67 @@ float ofxDigitalDanceBvh::phi_DistanceScore(int bvh_path_num, vector<vector<floa
 		}
 	}
 	return min_distance;
+}
+
+float ofxDigitalDanceBvh::comparePose(ofxDigitalDanceBvh *next, ofQuaternion &quat, ofVec3f &trans)
+{
+    if(this->getNumJoints() != next->getNumJoints())
+        cout << "error : different number of joints" << endl;
+
+    std::vector<float> weights;
+    weights.resize(this->getNumJoints());
+    std::fill(weights.begin(), weights.end(), 1.0f);    // you can change the weight for each joints
+    
+    weights[0] = 1000;
+    weights[1] = 100;
+    weights[2] = 10;
+    
+    float A,B,C,D;
+    A = B = C = D = 0.0f;
+    
+    float _x1 = 0.0f;
+    float _x2 = 0.0f;
+    float _z1 = 0.0f;
+    float _z2 = 0.0f;
+
+    for (int i=0; i<this->getNumJoints(); i++) {
+        _x1 += weights[i] * this->getJoint(i)->getPosition().x;
+        _x2 += weights[i] * next->getJoint(i)->getPosition().x;
+        _z1 += weights[i] * this->getJoint(i)->getPosition().z;
+        _z2 += weights[i] * next->getJoint(i)->getPosition().z;
+    }
+
+    float w = 0.0f;
+    for (int i=0; i<this->getNumJoints(); i++) {
+        w += weights[i] ;
+    }
+    
+    for (int i=0; i<this->getNumJoints(); i++) {
+        float x1 = this->getJoint(i)->getPosition().x;
+        float x2 = next->getJoint(i)->getPosition().x;
+        float z1 = this->getJoint(i)->getPosition().z;
+        float z2 = next->getJoint(i)->getPosition().z;
+        
+        A += weights[i] * (x1*z2 - x2*z1);
+        B += 1.0f/w * (_x1*_z2 - _x2*_z1);
+        C += weights[i] * (x1*x2 + z1*z2);
+        D += 1.0f/w * (_x1*_x2 + _z1*_z2);
+    }
+    
+    float theta = atan( (A-B)/(C-D) );
+    float x0 = 1.0f/w * (_x1 - _x2 * cos(theta) - _z2 * sin(theta));
+    float z0 = 1.0f/w * (_z1 + _x2 * sin(theta) - _z2 * cos(theta));
+
+    ofMatrix4x4 mat;
+    mat.makeRotationMatrix(ofRadToDeg(theta), 0, 1, 0);
+    mat.translate(x0, 0.0f, z0);
+
+    quat = mat.getRotate();
+    trans = mat.getTranslation();
+    
+    float error = 0.0f;
+    for (int i=0; i<this->getNumJoints(); i++) {
+        error += weights[i] * (this->getJoint(i)->getPosition() - (mat.getRotate() * next->getJoint(i)->getPosition() + mat.getTranslation())).length();
+    }
+    return error;
 }

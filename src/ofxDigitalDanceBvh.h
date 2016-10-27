@@ -10,6 +10,9 @@ class ofxDigitalDanceBvh : public ofxBvh
 {
 public:
 
+    ofxDigitalDanceBvh();
+    ~ofxDigitalDanceBvh();
+    
     int getNumFrames();
     int getFrameSize();
 
@@ -22,6 +25,8 @@ public:
     virtual void draw();
     void drawElipsoid();
     void drawPerfume();
+    void drawMixMotion(ofxDigitalDanceBvh *next, float value, ofQuaternion& quat, ofVec3f& trans);
+    void drawMixMotion(ofxDigitalDanceBvh *next, float value, ofQuaternion& quat1, ofVec3f& trans1, ofQuaternion& quat2, ofVec3f& trans2);
 
 	void exportAngulartoCSV(string filename);
     void exportAngulartoTXT(string filename);
@@ -29,6 +34,8 @@ public:
     float getWeightEffort();
     float getVelAve();
     float getFrameTime();
+    
+    float comparePose(ofxDigitalDanceBvh *next, ofQuaternion &quat, ofVec3f &trans);
     
 	void childroop(const ofxBvhJoint* joint, string str);
     void childroopScaledOffset(const ofxBvhJoint* joint, string str, float scale);
@@ -39,9 +46,10 @@ public:
     void InterpolateAttitude(string filename, ofxDigitalDanceBvh* next, int range);
     void LerpBVH(string filename1, string filename2, int range);
     void LerpBVH(ofxDigitalDanceBvh* next, int range);
+    void LerpBVH(ofxDigitalDanceBvh* next, int range, float interpolate, int startFrame1, int endFrame1, int startFrame2, int endFrame3);
 	void CubicInterpolateBVH(ofxDigitalDanceBvh* next, int range);
     float CubicInterpolate(float start, float stop, float amt);
-    float calcInterpolateValue(const int p, const int range);
+    static float calcInterpolateValue(const float& p, const float& range);
 
 	float getConnectivity(ofxDigitalDanceBvh* next);
     void FillBlank(int num_seg, ofxDigitalDanceBvh bvhs[], int arraysize, int start = 0, int goal = 1);
