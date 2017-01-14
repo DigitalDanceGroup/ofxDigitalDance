@@ -29,6 +29,7 @@ public:
     const float getWeightEffort();
     const float getVelAve();
     const float getConnectivity(ofxDigitalDanceBvh* next);
+	const ofVec3f getJointPosition(int frame, int jointIndex);
 
     ///-------------------
     /// setter
@@ -88,7 +89,12 @@ public:
     void exportAngulartoTXT(string filename);
     void exportAngularVelocity(string filename);
     //vector<vector<double>> ofxBvh::exportAngular();
-    
+   
+	///-------------------
+	/// Weight Effort
+	///-------------------
+	float computeWeightEffort(int frame);
+
     ///-------------------
     /// interpolation
     ///-------------------
@@ -160,6 +166,8 @@ private:
     
     /// function
     void drawElipsoid(ofPoint p1, ofPoint p2, float thickness);
+	const ofVec3f getRotationEuler(int frame, int jointIndex);
+
 };
 
 struct Node

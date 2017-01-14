@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<ItemGroup>
+		<ClCompile Include="src\ofApp.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\main.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\main.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="src\ofApp.cpp">
+			<Filter>src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxBvh\src\ofxBvh.cpp">
+			<Filter>addons\ofxBvh\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxDigitalDance\src\ofxDigitalDance.cpp">
+			<Filter>addons\ofxDigitalDance\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\..\addons\ofxDigitalDance\src\ofxDigitalDanceBvh.cpp">
+			<Filter>addons\ofxDigitalDance\src</Filter>
+		</ClCompile>
+	</ItemGroup>
+	<ItemGroup>
+		<Filter Include="src">
+			<UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons">
+			<UniqueIdentifier>{71834F65-F3A9-211E-73B8-DC85}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxBvh">
+			<UniqueIdentifier>{3B9A6E70-C304-47E3-2B54-9D61}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxBvh\src">
+			<UniqueIdentifier>{0796B04A-50EE-088C-DF1E-E044}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxDigitalDance">
+			<UniqueIdentifier>{87E838DC-B7CC-8A90-1F20-7B97}</UniqueIdentifier>
+		</Filter>
+		<Filter Include="addons\ofxDigitalDance\src">
+			<UniqueIdentifier>{699C06E2-CA58-FC76-90AE-EFA2}</UniqueIdentifier>
+		</Filter>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="src\ofApp.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="src\ofApp.h">
+			<Filter>src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxBvh\src\ofxBvh.h">
+			<Filter>addons\ofxBvh\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxDigitalDance\src\ofxDigitalDance.h">
+			<Filter>addons\ofxDigitalDance\src</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\..\addons\ofxDigitalDance\src\ofxDigitalDanceBvh.h">
+			<Filter>addons\ofxDigitalDance\src</Filter>
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ResourceCompile Include="icon.rc" />
+	</ItemGroup>
+</Project>

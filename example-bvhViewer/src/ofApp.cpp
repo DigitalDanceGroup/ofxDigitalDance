@@ -38,7 +38,7 @@ void ofApp::draw(){
     cam.begin();
 
 	for (int i = 0; i < bvh.size(); i++) {
-		bvh[i].drawPerfume();
+		//bvh[i].drawElipsoid();
 	}
 
 	cam.end();

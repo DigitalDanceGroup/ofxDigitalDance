@@ -6,6 +6,7 @@ ofxDigitalDanceBvh::ofxDigitalDanceBvh()
 {
     
 }
+
 ofxDigitalDanceBvh::~ofxDigitalDanceBvh()
 {
     
@@ -20,7 +21,7 @@ const int ofxDigitalDanceBvh::getFrame() const
     int frame = floor(play_head / frame_time);
     
     if( frame >= this->getNumFrames())
-        return this->getNumFrames()-1;
+        return this->getNumFrames(); // modified from "return this->getNumFrames()-1" for loop
     else
         return frame;
 }
@@ -57,9 +58,10 @@ const float ofxDigitalDanceBvh::getWeightEffort() {
                 count_joint++;
                 
                 // ŠeŠÖß‚²‚Æ‚ÉyŽ², xŽ², zŽ²Žü‚è‚Ì‰ñ“]
-                weighteffort_total_frame += abs(frames.at(i).at(3 + (3 * j) - (3 * countend)) - frames.at(i - 1).at(3 + (3 * j) - (3 * countend))) / this->frame_time
-                + abs(frames.at(i).at(4 + (3 * j) - (3 * countend)) - frames.at(i - 1).at(4 + (3 * j) - (3 * countend))) / this->frame_time
-                + abs(frames.at(i).at(5 + (3 * j) - (3 * countend)) - frames.at(i - 1).at(5 + (3 * j) - (3 * countend))) / this->frame_time;
+                weighteffort_total_frame += 
+				      abs(frames.at(i).at(3 + (3 * j) - (3 * countend)) - frames.at(i - 1).at(3 + (3 * j) - (3 * countend))) / this->frame_time
+					+ abs(frames.at(i).at(4 + (3 * j) - (3 * countend)) - frames.at(i - 1).at(4 + (3 * j) - (3 * countend))) / this->frame_time
+				    + abs(frames.at(i).at(5 + (3 * j) - (3 * countend)) - frames.at(i - 1).at(5 + (3 * j) - (3 * countend))) / this->frame_time;
             }
             else if (name == "Site") {
                 countend++;
@@ -155,6 +157,34 @@ const float ofxDigitalDanceBvh::getConnectivity(ofxDigitalDanceBvh* next) {
     return Sim_pose + Sim_move;
 }
 
+const ofVec3f ofxDigitalDanceBvh::getRotationEuler(int frame, int jointIndex)
+{
+	float x = frames.at(frame).at(3 + (3 * jointIndex));
+	float y = frames.at(frame).at(4 + (3 * jointIndex));
+	float z = frames.at(frame).at(5 + (3 * jointIndex));
+	return ofVec3f(x,y,z);
+}
+
+const ofVec3f ofxDigitalDanceBvh::getJointPosition(int frame, int jointIndex)
+{
+	int currentFrame;
+	bool changed = false;
+
+	// if current frame and required frame are different each other
+	if (this->getFrame() != frame) {
+		currentFrame = this->getFrame();
+		this->setFrame(frame);
+		changed = true;
+	}
+
+	ofVec3f pos = this->getJoint(jointIndex)->getPosition();
+
+	// replaced frame index
+	if(changed)
+		this->setFrame(currentFrame);
+
+	return pos;
+}
 
 ///-------------------
 /// setter
@@ -210,7 +240,7 @@ void ofxDigitalDanceBvh::update()
             if(index < frames.size())
                 currentFrame = frames[index];
             
-            if (index >= frames.size())
+			if (index >= frames.size())
             {
                 if (loop)
                     play_head = 0;
@@ -220,7 +250,7 @@ void ofxDigitalDanceBvh::update()
             
             if (play_head < 0)
                 play_head = 0;
-        }
+		}
     }
     
     if (need_update)
@@ -629,6 +659,44 @@ void ofxDigitalDanceBvh::exportAngularVelocity(string filename) {
         ofs << endl;
     }
     ofs.close();
+}
+
+
+///-------------------
+/// Weight Effort
+///-------------------
+float ofxDigitalDanceBvh::computeWeightEffort(int frame)
+{
+	if (frame > 0 && frame < num_frames)
+	{
+		int count_joint = 0; // number of joint for WeightEffort
+		int countend = 0;
+		double we_total = double(0.0); // total ofweight effort
+
+		for (int j = 0; j < this->getNumJoints(); j++) {
+			string name = this->getJoint(j)->getName();
+
+			// joint name for WeightEffort
+			if (name == "RightShoulder" || name == "RightElbow" || name == "LeftShoulder" ||
+				name == "LeftElbow" || name == "RightHip" || name == "RightKnee" || name == "LeftHip" || name == "LeftKnee")
+			{
+
+				ofVec3f v0 = getRotationEuler(frame    , j - countend);
+				ofVec3f v1 = getRotationEuler(frame - 1, j - countend);
+				ofVec3f v = v0 - v1;
+				we_total += (abs(v.x) + abs(v.y) + abs(v.z));
+				count_joint++;
+			}
+			else if (name == "Site") {
+				countend++;
+			}
+		}
+		we_total = we_total / (float)count_joint;
+		return we_total;
+	}
+	else {
+		return 0.0f;
+	}
 }
 
 
