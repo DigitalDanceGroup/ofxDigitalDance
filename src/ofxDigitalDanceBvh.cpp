@@ -662,6 +662,7 @@ void ofxDigitalDanceBvh::exportAngularVelocity(string filename) {
 }
 
 
+
 ///-------------------
 /// Weight Effort
 ///-------------------
