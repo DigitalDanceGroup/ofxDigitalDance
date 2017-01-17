@@ -79,6 +79,9 @@ xcuserdata
 ipch/
 *.sln
 *.user
+*.vcxproj
+*.db
+*.filters
 
 # Eclipse
 .metadata
