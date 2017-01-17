@@ -6,6 +6,7 @@ ofxDigitalDanceBvh::ofxDigitalDanceBvh()
 {
     
 }
+
 ofxDigitalDanceBvh::~ofxDigitalDanceBvh()
 {
     
