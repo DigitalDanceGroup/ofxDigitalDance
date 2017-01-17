@@ -21,6 +21,7 @@ private:
 	// movie data
 	ofVideoPlayer mVideo;
 
+
 	// emotional data
 
 };
