@@ -15,6 +15,7 @@ For more details about ofxDigitalDance, see <a href="http://research.mlabdance.c
 + openframeworks v0.9.8
 + MacOSX Sierra
 + Xcode 8
+
 ## Dependensies
 + <a href="https://github.com/perfume-dev/example-openFrameworks">ofxBvh</a>
 
