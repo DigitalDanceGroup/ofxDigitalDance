@@ -176,12 +176,16 @@
 		<ClCompile Include="..\..\..\addons\ofxBvh\src\ofxBvh.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxDigitalDance\src\ofxDigitalDance.cpp" />
 		<ClCompile Include="..\..\..\addons\ofxDigitalDance\src\ofxDigitalDanceBvh.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxDigitalDance\src\ofxMotionRhythm.cpp" />
+		<ClCompile Include="..\..\..\addons\ofxDigitalDance\src\ofxWeightEffort.cpp" />
 	</ItemGroup>
 	<ItemGroup>
 		<ClInclude Include="src\ofApp.h" />
 		<ClInclude Include="..\..\..\addons\ofxBvh\src\ofxBvh.h" />
 		<ClInclude Include="..\..\..\addons\ofxDigitalDance\src\ofxDigitalDance.h" />
 		<ClInclude Include="..\..\..\addons\ofxDigitalDance\src\ofxDigitalDanceBvh.h" />
+		<ClInclude Include="..\..\..\addons\ofxDigitalDance\src\ofxMotionRhythm.h" />
+		<ClInclude Include="..\..\..\addons\ofxDigitalDance\src\ofxWeightEffort.h" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="$(OF_ROOT)\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">

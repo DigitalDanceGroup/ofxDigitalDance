@@ -38,7 +38,7 @@ void ofApp::draw(){
     cam.begin();
 
 	for (int i = 0; i < bvh.size(); i++) {
-		//bvh[i].drawElipsoid();
+		bvh[i].drawLine();
 	}
 
 	cam.end();
