@@ -6,10 +6,15 @@ Feel free to use it and let us know what you think.
 For more details about ofxDigitalDance, see <a href="http://research.mlabdance.com/">Digital Dance Group.</a>
 
 ## Environment
+### Windows
 + openFrameworks v0.9.3
 + Windows 10
 + Visual Studio 2015
 
+### MacOS
++ openframeworks v0.9.8
++ MacOSX Sierra
++ Xcode 8
 ## Dependensies
 + <a href="https://github.com/perfume-dev/example-openFrameworks">ofxBvh</a>
 
