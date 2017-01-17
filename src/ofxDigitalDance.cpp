@@ -12,3 +12,14 @@ ofxDigitalDance::~ofxDigitalDance()
 {
 
 }
+
+void ofxDigitalDance::updateMotion()
+{
+	mMotion.update();
+}
+
+void ofxDigitalDance::loadMotion(const string filename)
+{
+	mMotion.load(filename);
+	mMotion.play();
+}

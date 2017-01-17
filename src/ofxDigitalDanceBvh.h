@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "ofxBvh.h"
 #include "ofxWeightEffort.h"
+#include "ofxMotionRhythm.h"
 
 namespace mlib
 {
@@ -15,6 +16,8 @@ public:
 	ofxDigitalDanceBvh(const ofxDigitalDanceBvh &rhs);
     virtual ~ofxDigitalDanceBvh();
     
+	bool isLoaded();
+
     ///-------------------
     /// getter
     ///-------------------
@@ -28,9 +31,11 @@ public:
     const int getNumFrames() const;
     const int getFrameSize() const;
     const float getFrameTime() const;
+	const float getTime() const;
     const float getWeightEffort();
     const float getVelAve();
     const float getConnectivity(ofxDigitalDanceBvh* next);
+	const ofVec3f getRotationEuler(int frame, int jointIndex);
 	const ofVec3f getJointPosition(int frame, int jointIndex);
 
     ///-------------------
@@ -97,7 +102,8 @@ public:
 	///-------------------
 	/// Weight Effort
 	///-------------------
-	float computeWeightEffort(int frame);
+	//float computeWeightEffort(int frame);
+	//vector<float> &computeWeightEffortAll();
 
     ///-------------------
     /// interpolation
@@ -170,9 +176,6 @@ private:
     
     /// function
     void drawElipsoid(ofPoint p1, ofPoint p2, float thickness);
-	const ofVec3f getRotationEuler(int frame, int jointIndex);
-
-//	ofxWeightEffort 
 };
 
 struct Node

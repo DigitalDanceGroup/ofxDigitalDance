@@ -30,6 +30,14 @@ ofxDigitalDanceBvh::~ofxDigitalDanceBvh()
 	this->unload();
 }
 
+bool ofxDigitalDanceBvh::isLoaded()
+{
+	if (this->frames.size() > 0)
+		return true;
+	else
+		return false;
+}
+
 ///-------------------
 /// getter
 ///-------------------
@@ -57,6 +65,11 @@ const int ofxDigitalDanceBvh::getFrameSize() const
 const float ofxDigitalDanceBvh::getFrameTime() const
 {
     return frame_time;
+}
+
+const float ofxDigitalDanceBvh::getTime() const
+{
+	return play_head;
 }
 
 // 関節角度で激しさを計算
@@ -249,6 +262,7 @@ void ofxDigitalDanceBvh::update()
         int last_index = getFrame();
         
         play_head += ofGetLastFrameTime() * rate;
+
         int index = getFrame();
         
         if (index != last_index)
@@ -707,50 +721,57 @@ void ofxDigitalDanceBvh::exportAngularVelocity(string filename) {
 }
 
 
-
 ///-------------------
 /// Weight Effort
-///-------------------
-float ofxDigitalDanceBvh::computeWeightEffort(int frame)
-{
-	if (frame > 0 && frame < num_frames)
-	{
-		int count_joint = 0; // number of joint for WeightEffort
-		int countend = 0;
-		double we_total = double(0.0); // total ofweight effort
-
-		for (int j = 0; j < this->getNumJoints(); j++) {
-			string name = this->getJoint(j)->getName();
-
-			// joint name for WeightEffort
-			if (name == "RightShoulder" || name == "RightElbow" || name == "LeftShoulder" ||
-				name == "LeftElbow" || name == "RightHip" || name == "RightKnee" || name == "LeftHip" || name == "LeftKnee")
-			{
-
-				ofVec3f v0 = getRotationEuler(frame    , j - countend);
-				ofVec3f v1 = getRotationEuler(frame - 1, j - countend);
-				ofVec3f v = v0 - v1;
-				we_total += (abs(v.x) + abs(v.y) + abs(v.z));
-				count_joint++;
-			}
-			else if (name == "Site") {
-				countend++;
-			}
-		}
-		we_total = we_total / (float)count_joint;
-		return we_total;
-	}
-	else {
-		return 0.0f;
-	}
-}
+//-------------------
+//float ofxDigitalDanceBvh::computeWeightEffort(int frame)
+//{
+//	if (frame > 0 && frame < num_frames)
+//	{
+//		int count_joint = 0; // number of joint for WeightEffort
+//		int countend = 0;
+//		double we_total = double(0.0); // total ofweight effort
+//
+//		for (int j = 0; j < this->getNumJoints(); j++) {
+//			string name = this->getJoint(j)->getName();
+//
+//			// joint name for WeightEffort
+//			if (name == "RightShoulder" || name == "RightElbow" || name == "LeftShoulder" ||
+//				name == "LeftElbow" || name == "RightHip" || name == "RightKnee" || name == "LeftHip" || name == "LeftKnee")
+//			{
+//
+//				ofVec3f v0 = getRotationEuler(frame    , j - countend);
+//				ofVec3f v1 = getRotationEuler(frame - 1, j - countend);
+//				ofVec3f v = v0 - v1;
+//				we_total += (abs(v.x) + abs(v.y) + abs(v.z));
+//				count_joint++;
+//			}
+//			else if (name == "Site") {
+//				countend++;
+//			}
+//		}
+//		we_total = we_total / (float)count_joint;
+//		return we_total;
+//	}
+//	else {
+//		return 0.0f;
+//	}
+//}
+//
+//vector<float> &ofxDigitalDanceBvh::computeWeightEffortAll()
+//{
+//	vector<float> we;
+//	for (int i = 0; i < this->getNumFrames(); i++) {
+//		float value = computeWeightEffort(i);
+//		we.push_back(value);
+//	}
+//	return we;
+//}
 
 
 ///-------------------
 /// interpolation
 ///-------------------
-
-
 
 const ofMatrix4x4 ofxDigitalDanceBvh::calcTrackPoseMatrix(ofxDigitalDanceBvh& current,
                                                           ofxDigitalDanceBvh& next,
@@ -1440,7 +1461,6 @@ void ofxDigitalDanceBvh::segmentationBVH_4C(string filename) {
 ///-------------------
 
 
-
 // リサンプリング
 void ofxDigitalDanceBvh::Resampling(const float frametime, string filename) {
     string str = " ";
@@ -1578,8 +1598,6 @@ void ofxDigitalDanceBvh::Resampling(const float frametime, string filename) {
     
     ofs.close();
 }
-
-
 
 int ofxDigitalDanceBvh::GreedySampling(float q, float weighteffort[], float max_WE, vector<vector<float>>& D, int Sn[], int n, float rho) {
     cout << D.size() << endl;

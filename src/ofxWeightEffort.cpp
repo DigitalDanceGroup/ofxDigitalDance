@@ -87,48 +87,60 @@ void setVector(ofxDigitalDanceBvh &bvh, vector<ofVec3f> &vec)
 		}
 		else if (o->getChildren().size() == 1)
 		{
-			ofVec3f v = o->getChildren()[0]->getPosition() - o->getPosition();
-			vec.push_back(v);
+			ofQuaternion v = o->getChildren()[0]->getRotate() - o->getRotate();
+			vec.push_back(v.getEuler());
 		}
 		else if (o->getChildren().size() > 1)
 		{
 			for (int i = 0; i < o->getChildren().size(); i++) {
-				ofVec3f v = o->getChildren()[i]->getPosition() - o->getPosition();
-				vec.push_back(v);
+				ofQuaternion v = o->getChildren()[i]->getRotate() - o->getRotate();
+				vec.push_back(v.getEuler());
 			}
 		}
 	}
 }
 
 
-void ofxWeightEffort::computeWeightEffort(ofxDigitalDanceBvh &bvh, int frame)
+float ofxWeightEffort::computeWeightEffort(ofxDigitalDanceBvh &bvh, int frame)
 {
-	if (bvh.getNumFrames() < frame + 1) {
-		return;
-	}
-
-	int currentFrame;
-	bool changed = false;
-	std::vector<ofVec3f> frame_1;
-	std::vector<ofVec3f> frame_2;
-
-	// if current frame and required frame are different each other
-	if (bvh.getFrame() != frame) {
-		currentFrame = bvh.getFrame();
-		changed = true;
-	}
-
-	// frame1
-	bvh.setFrame(frame);
-	setVector(bvh, frame_1);
-
-	// frame2
-	bvh.setFrame(frame + 1);
-	setVector(bvh, frame_2);
-
-	int numJoints = frame_1.size();
-	for (int i = 0; i < numJoints; i++)
+	if (frame > 0 && frame < bvh.getNumFrames())
 	{
-		frame_2[i] - frame_1[i];
+		int count_joint = 0; // number of joint for WeightEffort
+		int countend = 0;
+		double we_total = double(0.0); // total ofweight effort
+
+		for (int j = 0; j < bvh.getNumJoints(); j++) {
+			string name = bvh.getJoint(j)->getName();
+
+			// joint name for WeightEffort
+			if (name == "RightShoulder" || name == "RightElbow" || name == "LeftShoulder" ||
+				name == "LeftElbow" || name == "RightHip" || name == "RightKnee" || name == "LeftHip" || name == "LeftKnee")
+			{
+
+				ofVec3f v0 = bvh.getRotationEuler(frame, j - countend);
+				ofVec3f v1 = bvh.getRotationEuler(frame - 1, j - countend);
+				ofVec3f v = v0 - v1;
+				we_total += (abs(v.x) + abs(v.y) + abs(v.z));
+				count_joint++;
+			}
+			else if (name == "Site") {
+				countend++;
+			}
+		}
+		we_total = we_total / (float)count_joint;
+		return we_total;
 	}
+	else {
+		return 0.0f;
+	}
+}
+
+vector<float> &ofxWeightEffort::computeWeightEffortAll(ofxDigitalDanceBvh &bvh)
+{
+	vector<float> we;
+	for (int i = 0; i < bvh.getNumFrames(); i++) {
+		float value = computeWeightEffort(bvh, i);
+		we.push_back(value);
+	}
+	return we;
 }
