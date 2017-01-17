@@ -4,15 +4,24 @@
 #include "ofxDigitalDanceBvh.h"
 
 using namespace mlib;
-typedef std::tuple<string, string, float> jointTuple;
 
-class weightEffort {
+class ofxDigitalDance
+{
 public:
-	void setWeight(ofxDigitalDanceBvh &bvh);
-	void computeWeightEffort(ofxDigitalDanceBvh &bvh, int frame);
-
+	ofxDigitalDance();
+	~ofxDigitalDance();
 
 private:
-	vector<float> mWeight;
-	//vector<jointTuple> mWeight;
+	// motion data
+	ofxDigitalDanceBvh mMotion;
+
+	// sound data
+	ofSoundPlayer mSound;
+
+	// movie data
+	ofVideoPlayer mVideo;
+
+
+	// emotional data
+
 };

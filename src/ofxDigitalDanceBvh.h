@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxBvh.h"
+#include "ofxWeightEffort.h"
 
 namespace mlib
 {
@@ -11,7 +12,8 @@ class ofxDigitalDanceBvh : public ofxBvh
 public:
 
     ofxDigitalDanceBvh();
-    ~ofxDigitalDanceBvh();
+	ofxDigitalDanceBvh(const ofxDigitalDanceBvh &rhs);
+    virtual ~ofxDigitalDanceBvh();
     
     ///-------------------
     /// getter
@@ -71,6 +73,8 @@ public:
      */
     void drawPerfume();
     
+	static void drawFloor(const float glidSize, const float stepSize);
+
     /*
      @ description
         draw skeleton using elipsoid with blending two motion
@@ -168,6 +172,7 @@ private:
     void drawElipsoid(ofPoint p1, ofPoint p2, float thickness);
 	const ofVec3f getRotationEuler(int frame, int jointIndex);
 
+//	ofxWeightEffort 
 };
 
 struct Node

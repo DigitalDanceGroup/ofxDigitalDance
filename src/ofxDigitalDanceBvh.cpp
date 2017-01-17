@@ -4,12 +4,30 @@ using namespace mlib;
 
 ofxDigitalDanceBvh::ofxDigitalDanceBvh()
 {
-    
+	this->root = NULL;
+	this->total_channels = 0;
+	this->rate = 1;
+	this->loop = false;
+	this->playing = false;
+	this->play_head = 0;
+	this->need_update = false;
+}
+
+ofxDigitalDanceBvh::ofxDigitalDanceBvh(const ofxDigitalDanceBvh &rhs)
+{
+	this->frames = rhs.frames;
+	this->root = rhs.root;
+	this->total_channels = rhs.total_channels;
+	this->rate = rhs.rate;
+	this->loop = rhs.loop;
+	this->playing = rhs.playing;
+	this->play_head = rhs.play_head;
+	this->need_update = rhs.need_update;
 }
 
 ofxDigitalDanceBvh::~ofxDigitalDanceBvh()
 {
-    
+	this->unload();
 }
 
 ///-------------------
@@ -351,6 +369,33 @@ void ofxDigitalDanceBvh::drawPerfume()
     ofSetColor(ofColor::white);
 }
 
+void ofxDigitalDanceBvh::drawFloor(const float numGlid, const float scale)
+{
+	unsigned int GridSizeX = numGlid;
+	unsigned int GridSizeZ = numGlid;
+	unsigned int SizeX = scale;
+	unsigned int SizeZ = scale;
+
+	glBegin(GL_QUADS);
+	for (unsigned int x = 0; x<GridSizeX; ++x)
+		for (unsigned int y = 0; y<GridSizeZ; ++y)
+		{
+			if ((x + y)%2==0) //modulo 2
+				glColor3f(0.8f, 0.8f, 0.8f); //white
+			else
+				glColor3f(0.0f, 0.0f, 0.0f); //black
+
+			ofVec3f pos;
+			pos.x = -(float)(GridSizeX * SizeZ) / 2.0f;
+			pos.z = -(float)(GridSizeZ * SizeZ) / 2.0f;;
+			glVertex3f(pos.x + x*SizeX, 0, pos.z + y*SizeZ);
+			glVertex3f(pos.x + (x + 1)*SizeX, 0, pos.z + y*SizeZ);
+			glVertex3f(pos.x + (x + 1)*SizeX, 0, pos.z + (y + 1)*SizeZ);
+			glVertex3f(pos.x + x*SizeX, 0, pos.z + (y + 1)*SizeZ);
+
+		}
+	glEnd();
+}
 
 void ofxDigitalDanceBvh::drawMixMotion(ofxDigitalDanceBvh *next, float value,
                                        ofQuaternion& quat, ofVec3f& trans)
